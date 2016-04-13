@@ -14000,8 +14000,8 @@ Standard 5-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <part name="U$2" library="ME 433 PCB lib" deviceset="PIC32MX250F128B" device=""/>
 <part name="R1" library="ME 433 PCB lib" deviceset="R-US_" device="0207/10" value="330"/>
 <part name="R2" library="ME 433 PCB lib" deviceset="R-US_" device="0207/10" value="330"/>
-<part name="R3" library="ME 433 PCB lib" deviceset="R-US_" device="0207/10"/>
-<part name="R4" library="ME 433 PCB lib" deviceset="R-US_" device="0207/10"/>
+<part name="R3" library="ME 433 PCB lib" deviceset="R-US_" device="0207/10" value="10k"/>
+<part name="R4" library="ME 433 PCB lib" deviceset="R-US_" device="0207/10" value="10k"/>
 <part name="C1" library="ME 433 PCB lib" deviceset="C-US" device="025-025X050" value="0.1uF"/>
 <part name="C2" library="ME 433 PCB lib" deviceset="C-US" device="025-025X050"/>
 <part name="C3" library="ME 433 PCB lib" deviceset="C-US" device="025-025X050" value="0.1uF"/>
@@ -14091,8 +14091,8 @@ Standard 5-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 <instance part="GND15" gate="1" x="-5.08" y="88.9"/>
 <instance part="+3V2" gate="G$1" x="162.56" y="134.62"/>
 <instance part="+3V3" gate="G$1" x="162.56" y="86.36"/>
-<instance part="+3V4" gate="G$1" x="106.68" y="35.56"/>
-<instance part="P+2" gate="1" x="147.32" y="35.56"/>
+<instance part="+3V4" gate="G$1" x="101.6" y="35.56"/>
+<instance part="P+2" gate="1" x="154.94" y="35.56"/>
 <instance part="+3V5" gate="G$1" x="73.66" y="71.12"/>
 <instance part="+3V6" gate="G$1" x="60.96" y="45.72"/>
 <instance part="+3V7" gate="G$1" x="15.24" y="10.16"/>
@@ -14249,7 +14249,7 @@ Standard 5-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 </segment>
 <segment>
 <pinref part="J3" gate="G$1" pin="2"/>
-<wire x1="137.16" y1="33.02" x2="147.32" y2="33.02" width="0.1524" layer="91"/>
+<wire x1="137.16" y1="33.02" x2="154.94" y2="33.02" width="0.1524" layer="91"/>
 <pinref part="P+2" gate="1" pin="+5V"/>
 </segment>
 <segment>
@@ -14301,7 +14301,7 @@ Standard 5-pin 0.1" header. Use with straight break away headers (SKU : PRT-0011
 </segment>
 <segment>
 <pinref part="J2" gate="G$1" pin="2"/>
-<wire x1="114.3" y1="33.02" x2="106.68" y2="33.02" width="0.1524" layer="91"/>
+<wire x1="114.3" y1="33.02" x2="101.6" y2="33.02" width="0.1524" layer="91"/>
 <pinref part="+3V4" gate="G$1" pin="+3V3"/>
 </segment>
 <segment>

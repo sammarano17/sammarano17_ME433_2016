@@ -170,10 +170,6 @@
 <text x="43.18" y="20.32" size="1.27" layer="25">B7</text>
 <text x="43.18" y="17.78" size="1.27" layer="25">5V</text>
 <text x="43.18" y="15.24" size="1.27" layer="25">GND</text>
-<text x="13.335" y="12.7" size="1.27" layer="25" rot="R90">8MHz</text>
-<text x="33.02" y="12.7" size="1.778" layer="25">SAM</text>
-<text x="33.02" y="10.16" size="1.778" layer="25">MARANO</text>
-<text x="33.02" y="7.62" size="1.778" layer="25">ME 433</text>
 </plain>
 <libraries>
 <library name="ME 433 PCB lib">
