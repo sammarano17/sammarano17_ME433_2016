@@ -91,8 +91,70 @@ void i2c_master_stop(void) {          // send a STOP:
   while(I2C2CONbits.PEN) { ; }        // wait for STOP to complete
 }
 
-//
+//IMU Setup//
 
-//Read Multiple function//
-void I2C_read_multiple(char address, char register, unsigned char * data, char length)
+unsigned char readIMU(void){
+    i2c_master_start();
+    i2c_master_send(IMU_ADDRESS<1|0);
+    i2c_master_send(0x0F);
+    i2c_master_restart();
+    i2c_master_send(IMU_ADDRESS<1|1);
+    char r = i2c_master_recv();
+    i2c_master_ack(1); 
+    i2c_master_stop(); 
+    return r;
+}
+
+unsigned char I2C_read_single(void){
+    i2c_master_start();
+    i2c_master_send(IMU_ADDRESS);
+    i2c_master_send(0x0F); // read from the who_am_i register to get logic
+    i2c_master_restart();
+    i2c_master_send(0b11010111); // send the read command, 1 lsb means read
+    unsigned char b = i2c_master_recv();
+    i2c_master_ack(1);
+    i2c_master_stop();
+    return b;
+}
+
+int main() {
+    __builtin_disable_interrupts();
+
+    // set the CP0 CONFIG register to indicate that kseg0 is cacheable (0x3)
+    __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
+
+    // 0 data RAM access wait states
+    BMXCONbits.BMXWSDRM = 0x0;
+
+    // enable multi vector interrupts
+    INTCONbits.MVEC = 0x1;
+
+    // disable JTAG to get pins back
+    DDPCONbits.JTAGEN = 0;
+    
+    // do your TRIS and LAT commands here
+    TRISAbits.TRISA4 = 0;     // ouput
+    TRISBbits.TRISB4 = 1;     // input
+
+    initI2C2();
+    
+    __builtin_enable_interrupts();
+    
+    unsigned char test;
+    
+    while(1) {
+	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
+		// remember the core timer runs at half the CPU speed
+        _CP0_SET_COUNT(0);                   // set core timer to 0
+        while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
+        LATAbits.LATA4 = 0;       // intialize LED on
         
+        test = I2C_read_single();
+        if (test==0b01101001){
+            LATAbits.LATA4 = 1;
+        }
+        else {
+            LATAbits.LATA4 = 0;
+        }
+    }
+}
