@@ -1,7 +1,7 @@
 #include<xc.h>           // processor SFR definitions
 #include<sys/attribs.h>  // __ISR macro
 #include <stdio.h>
-#include <math.h> // used in HW4
+#include <math.h> 
 #define CS LATBbits.LATB7   // chip select pin
 
 // DEVCFG0
@@ -94,27 +94,16 @@ void i2c_master_stop(void) {          // send a STOP:
 //IMU Setup//
 
 unsigned char readIMU(void){
+    //LATAbits.LATA4 = 1;
     i2c_master_start();
     i2c_master_send(IMU_ADDRESS<1|0);
     i2c_master_send(0x0F);
     i2c_master_restart();
     i2c_master_send(IMU_ADDRESS<1|1);
-    char r = i2c_master_recv();
+    unsigned char r = i2c_master_recv();
     i2c_master_ack(1); 
     i2c_master_stop(); 
     return r;
-}
-
-unsigned char I2C_read_single(void){
-    i2c_master_start();
-    i2c_master_send(IMU_ADDRESS);
-    i2c_master_send(0x0F); // read from the who_am_i register to get logic
-    i2c_master_restart();
-    i2c_master_send(0b11010111); // send the read command, 1 lsb means read
-    unsigned char b = i2c_master_recv();
-    i2c_master_ack(1);
-    i2c_master_stop();
-    return b;
 }
 
 int main() {
@@ -146,10 +135,10 @@ int main() {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
-        while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
+        //while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
         LATAbits.LATA4 = 0;       // intialize LED on
         
-        test = I2C_read_single();
+        test = readIMU();
         if (test==0b01101001){
             LATAbits.LATA4 = 1;
         }
