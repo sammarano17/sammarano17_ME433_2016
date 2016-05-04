@@ -96,10 +96,10 @@ void i2c_master_stop(void) {          // send a STOP:
 unsigned char readIMU(void){
     //LATAbits.LATA4 = 1;
     i2c_master_start();
-    i2c_master_send(IMU_ADDRESS<1|0);
+    i2c_master_send(IMU_ADDRESS);
     i2c_master_send(0x0F);
     i2c_master_restart();
-    i2c_master_send(IMU_ADDRESS<1|1);
+    i2c_master_send(0b11010111);
     unsigned char r = i2c_master_recv();
     i2c_master_ack(1); 
     i2c_master_stop(); 
@@ -124,7 +124,7 @@ int main() {
     // do your TRIS and LAT commands here
     TRISAbits.TRISA4 = 0;     // ouput
     TRISBbits.TRISB4 = 1;     // input
-
+    LATAbits.LATA4 = 0;
     initI2C2();
     
     __builtin_enable_interrupts();
@@ -136,7 +136,7 @@ int main() {
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
         //while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
-        LATAbits.LATA4 = 0;       // intialize LED on
+               // intialize LED on
         
         test = readIMU();
         if (test==0b01101001){
