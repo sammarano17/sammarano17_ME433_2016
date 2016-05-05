@@ -56,7 +56,7 @@ void LCD_drawChar(unsigned short x2, unsigned short y2, char symbol){
             x = x2 + col;
             y = y2 + bit_index;
             if (set){
-                LCD_drawPixel(x, y, WHITE);
+                LCD_drawPixel(x, y, YELLOW);
             }
             else{
                 LCD_drawPixel(x, y, BLACK);
@@ -108,7 +108,7 @@ int main() {
     LCD_init();
     
     //unsigned short a = 0x0000;
-    char test;
+    //char test;
     //unsigned short test1 = 2;
     //unsigned short test2 = 3;
     int x = 1337;
@@ -123,8 +123,8 @@ int main() {
         LATAbits.LATA4 = 0;       // intialize LED on
         LCD_clearScreen(BLACK);
         //LCD_drawPixel(test1 + 4,test2 + 4,GREEN);
-        test = '!';
-        sprintf(array,"HELLO\nWORLD %i!",x);
+        //test = '!';
+        sprintf(array,"HELLO WORLD %i!",x);
         LCD_drawString(28,32,array);
         //LCD_drawChar(10,10,'S');
         

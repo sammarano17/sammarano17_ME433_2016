@@ -2,7 +2,7 @@
 #include<sys/attribs.h>  // __ISR macro
 #include <stdio.h>
 #include <math.h> 
-#define CS LATBbits.LATB7   // chip select pin
+#include "ILI9163C.h"
 
 // DEVCFG0
 #pragma config DEBUG = OFF // no debugging
@@ -40,6 +40,7 @@
 #pragma config FVBUSONIO = ON // USB BUSON controlled by USB module
 
 #define IMU_ADDRESS 0b1101011
+#define OUT_TEMP_L 0x20
 
 //CTRL1,CTRL2,CTRL3 initialize values//
 #define CTRL1_XL 0b10000001
@@ -91,20 +92,18 @@ void i2c_master_stop(void) {          // send a STOP:
   while(I2C2CONbits.PEN) { ; }        // wait for STOP to complete
 }
 
-//IMU Setup//
+//function initializations//
+unsigned char readIMU(void);
+void init_IMU(void);
+void I2C_read_multiple(char address, char Register, unsigned char * data, char length);
+void LCD_drawString(unsigned short x, unsigned short y, char *array);
 
-unsigned char readIMU(void){
-    //LATAbits.LATA4 = 1;
-    i2c_master_start();
-    i2c_master_send(IMU_ADDRESS);
-    i2c_master_send(0x0F);
-    i2c_master_restart();
-    i2c_master_send(0b11010111);
-    unsigned char r = i2c_master_recv();
-    i2c_master_ack(1); 
-    i2c_master_stop(); 
-    return r;
-}
+//variable init//
+//unsigned char test;
+    unsigned char output[14];
+    signed short temp,g_x,g_y,g_z,xl_x,xl_y,xl_z;
+    char array[100];
+
 
 int main() {
     __builtin_disable_interrupts();
@@ -125,12 +124,14 @@ int main() {
     TRISAbits.TRISA4 = 0;     // ouput
     TRISBbits.TRISB4 = 1;     // input
     LATAbits.LATA4 = 0;
+    
     initI2C2();
+    SPI1_init();
+    LCD_init();
     
     __builtin_enable_interrupts();
     
-    unsigned char test;
-    
+        
     while(1) {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		// remember the core timer runs at half the CPU speed
@@ -138,12 +139,142 @@ int main() {
         //while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
                // intialize LED on
         
-        test = readIMU();
-        if (test==0b01101001){
-            LATAbits.LATA4 = 1;
+        I2C_read_multiple(IMU_ADDRESS<<1,OUT_TEMP_L,output,14);
+        
+        temp = (output[0] | (output[1] << 8));
+        g_x = (output[2] | (output[3] << 8));
+        g_y = (output[4] | (output[5] << 8));
+        g_z = (output[6] | (output[7] << 8));
+        xl_x = (output[8] | (output[9] << 8));
+        xl_y = (output[10] | (output[11] << 8));
+        xl_z = (output[14] | (output[13] << 8));
+        
+        LCD_clearScreen(BLACK);
+        sprintf(array,"XL_X: %i",xl_x);
+        LCD_drawString(2,2,array);
+        sprintf(array,"XL_Y: %i",xl_y);
+        LCD_drawString(2,12,array);
+        sprintf(array,"XL_Z: %i",xl_z);
+        LCD_drawString(2,22,array);
+        sprintf(array,"G_X: %i",g_x);
+        LCD_drawString(2,32,array);
+        sprintf(array,"G_Y: %i",g_y);
+        LCD_drawString(2,42,array);
+        sprintf(array,"G_Z: %i",g_z);
+        LCD_drawString(2,52,array);
+        sprintf(array,"TEMP: %i",temp);
+        LCD_drawString(2,62,array);
+        
+        //test = readIMU();
+        //if (test==0b01101001){
+        //    LATAbits.LATA4 = 1;
+        //}
+        //else {
+        //    LATAbits.LATA4 = 0;
+        //}
+    }
+}
+
+
+//IMU Setup//
+
+unsigned char readIMU(void){
+    //LATAbits.LATA4 = 1;
+    i2c_master_start();
+    i2c_master_send(IMU_ADDRESS<<1);
+    i2c_master_send(0x0F);
+    i2c_master_restart();
+    i2c_master_send(0b11010111);
+    unsigned char r = i2c_master_recv();
+    i2c_master_ack(1); 
+    i2c_master_stop(); 
+    return r;
+}
+
+void init_IMU(void){
+    //init_XL//
+    i2c_master_start(); // make the start bit
+    i2c_master_send(IMU_ADDRESS<<1); // write the address, shifted left by 1, or'ed with a 0 to indicate writing
+    i2c_master_send(0x10); // the register to write to
+    i2c_master_send(CTRL1_XL); // the value to put in the register
+    i2c_master_stop(); // make the stop bit
+    //init_G//
+    i2c_master_start(); // make the start bit
+    i2c_master_send(IMU_ADDRESS<<1); // write the address, shifted left by 1, or'ed with a 0 to indicate writing
+    i2c_master_send(0x11); // the register to write to
+    i2c_master_send(CTRL2_G); // the value to put in the register
+    i2c_master_stop(); // make the stop bit
+    //init_C//
+    i2c_master_start(); // make the start bit
+    i2c_master_send(IMU_ADDRESS<<1); // write the address, shifted left by 1, or'ed with a 0 to indicate writing
+    i2c_master_send(0x12); // the register to write to
+    i2c_master_send(CTRL3_C); // the value to put in the register
+    i2c_master_stop(); // make the stop bit
+}
+
+void I2C_read_multiple(char address, char Register, unsigned char * data, char length){
+    int i = 0;
+    i2c_master_start();
+    i2c_master_send(address);
+    i2c_master_send(Register);
+    i2c_master_restart();
+    i2c_master_send(0b11010111);
+    for (i=0;i<=length;i++){
+    output[i] = i2c_master_recv();
+    if (i<length){
+        i2c_master_ack(0);
+    }
+    else if (i==length){
+        i2c_master_ack(1);
+    }
+    } 
+    i2c_master_stop(); 
+}
+
+
+//LCD functions//
+void LCD_drawChar(unsigned short, unsigned short, char);
+
+// LCD functions//
+void LCD_drawChar(unsigned short x2, unsigned short y2, char symbol){
+    int set, x, y, ascii_row;
+    int col = 0;
+    int bit_index = 0;
+    char bit_map;
+    
+    ascii_row = (int)(symbol - 32);
+    
+    while (col < 5){
+        bit_index = 0;
+        bit_map = ASCII[ascii_row][col];
+        while (bit_index < 8){
+            set = (bit_map >> bit_index) & 0x01;
+            x = x2 + col;
+            y = y2 + bit_index;
+            if (set){
+                LCD_drawPixel(x, y, YELLOW);
+            }
+            else{
+                LCD_drawPixel(x, y, BLACK);
+            }
+            bit_index++;
         }
-        else {
-            LATAbits.LATA4 = 0;
+        col++;
+    }
+}
+
+void LCD_drawString(unsigned short x, unsigned short y, char *array){
+    int i = 0;
+    int begin_pos = x;
+    while (array[i]!=0){
+        if (array[i]=='\n'){
+            y = y + 10;
+            x = begin_pos;
+            i++;
+            continue;
         }
+        LCD_drawChar(x,y,array[i]);
+        x = x + 6;
+        i++;
     }
 }

@@ -91,7 +91,7 @@ int main() {
      TRISAbits.TRISA4 = 0; // Set green LED(A4) as output ON
      LATAbits.LATA4 = 0;
 
-    unsigned char values; // store value returned from who_am_i register, unused
+    //unsigned char values; // store value returned from who_am_i register, unused
 
     while(1) {
 
@@ -99,7 +99,7 @@ int main() {
         _CP0_SET_COUNT(0); // core timer = 0, runs at half CPU speed
         while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
 
-        values = I2C_read_single(); // read from who_am_i register
+        //values = I2C_read_single(); // read from who_am_i register
         I2C_read_multiple(IMU_7bit, OUT_TEMP_L, outputs, 14); // multiple reads
         // data is read from OUT_TEMP_L, moving "upward" -- 14 registers total
         temp = (outputs[0] | (outputs[1] << 8));
