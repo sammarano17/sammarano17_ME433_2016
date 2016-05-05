@@ -69,7 +69,7 @@ int main() {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
-        //LATAbits.LATA4 = 1;       // intialize LED on
+        LATAbits.LATA4 = 0;       // intialize LED on
         
         LCD_drawPixel(0,0,GREEN);
         //LCD_clearScreen(CYAN);
@@ -78,4 +78,27 @@ int main() {
 
     }  
     
+}
+
+// LCD functions//
+void LCD_drawChar(unsigned short x2, unsigned short y2, char symbol){
+    unsigned short c;
+    int i=0;
+    int ii=0;
+    symbol = symbol - 32;
+    symbol = (int)symbol;
+    while (i<5){
+        while (ii<8){
+            
+            char ind = ASCII[symbol][i];
+            
+            LCD_drawPixel(x2,y2,c);
+            ii=ii+1;
+            
+        }
+        i=i+1;
+        if (ii==8){
+            ii=0;
+        }
+    }
 }
