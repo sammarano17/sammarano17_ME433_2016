@@ -37,6 +37,36 @@
 #pragma config FUSBIDIO = ON // USB pins controlled by USB module
 #pragma config FVBUSONIO = ON // USB BUSON controlled by USB module
 
+void LCD_drawChar(unsigned short, unsigned short, char);
+
+// LCD functions//
+void LCD_drawChar(unsigned short x2, unsigned short y2, char symbol){
+    int set, x, y, ascii_row;
+    int col = 0;
+    int bit_index = 0;
+    char bit_map;
+    
+    ascii_row = (int)(symbol - 32);
+    
+    while (col < 5){
+        bit_index = 0;
+        bit_map = ASCII[ascii_row][col];
+        while (bit_index < 8){
+            set = (bit_map >> bit_index) & 0x01;
+            x = x2 + col;
+            y = y2 + bit_index;
+            if (set){
+                LCD_drawPixel(x, y, WHITE);
+            }
+            else{
+                LCD_drawPixel(x, y, MAGENTA);
+            }
+            bit_index++;
+        }
+        col++;
+    }
+}
+
 int main() {
 
     __builtin_disable_interrupts();
@@ -62,6 +92,9 @@ int main() {
     LCD_init();
     
     //unsigned short a = 0x0000;
+    char test;
+    unsigned short test1 = 2;
+    unsigned short test2 = 3;
     
     __builtin_enable_interrupts();
     
@@ -70,35 +103,18 @@ int main() {
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
         LATAbits.LATA4 = 0;       // intialize LED on
+        LCD_clearScreen(MAGENTA);
+        LCD_drawPixel(test1 + 4,test2 + 4,GREEN);
+        test = '!';
+                
+        LCD_drawChar(10,10,'S');
+        LCD_drawChar(15,10,'A');
+        LCD_drawChar(20,10,'M');
         
-        LCD_drawPixel(0,0,GREEN);
-        //LCD_clearScreen(CYAN);
-        
+        while (_CP0_GET_COUNT() < 48000000){;}
                 
 
     }  
     
 }
 
-// LCD functions//
-void LCD_drawChar(unsigned short x2, unsigned short y2, char symbol){
-    unsigned short c;
-    int i=0;
-    int ii=0;
-    symbol = symbol - 32;
-    symbol = (int)symbol;
-    while (i<5){
-        while (ii<8){
-            
-            char ind = ASCII[symbol][i];
-            
-            LCD_drawPixel(x2,y2,c);
-            ii=ii+1;
-            
-        }
-        i=i+1;
-        if (ii==8){
-            ii=0;
-        }
-    }
-}
