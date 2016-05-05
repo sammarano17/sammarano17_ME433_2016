@@ -59,11 +59,27 @@ void LCD_drawChar(unsigned short x2, unsigned short y2, char symbol){
                 LCD_drawPixel(x, y, WHITE);
             }
             else{
-                LCD_drawPixel(x, y, MAGENTA);
+                LCD_drawPixel(x, y, BLACK);
             }
             bit_index++;
         }
         col++;
+    }
+}
+
+void LCD_drawString(unsigned short x, unsigned short y, char *array){
+    int i = 0;
+    int begin_pos = x;
+    while (array[i]!=0){
+        if (array[i]=='\n'){
+            y = y + 10;
+            x = begin_pos;
+            i++;
+            continue;
+        }
+        LCD_drawChar(x,y,array[i]);
+        x = x + 6;
+        i++;
     }
 }
 
@@ -93,8 +109,10 @@ int main() {
     
     //unsigned short a = 0x0000;
     char test;
-    unsigned short test1 = 2;
-    unsigned short test2 = 3;
+    //unsigned short test1 = 2;
+    //unsigned short test2 = 3;
+    int x = 1337;
+    char array[100];
     
     __builtin_enable_interrupts();
     
@@ -103,13 +121,14 @@ int main() {
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
         LATAbits.LATA4 = 0;       // intialize LED on
-        LCD_clearScreen(MAGENTA);
-        LCD_drawPixel(test1 + 4,test2 + 4,GREEN);
+        LCD_clearScreen(BLACK);
+        //LCD_drawPixel(test1 + 4,test2 + 4,GREEN);
         test = '!';
-                
-        LCD_drawChar(10,10,'S');
-        LCD_drawChar(15,10,'A');
-        LCD_drawChar(20,10,'M');
+        sprintf(array,"HELLO WORLD %i!",x);
+        LCD_drawString(28,32,array);
+        //LCD_drawChar(10,10,'S');
+        
+        
         
         while (_CP0_GET_COUNT() < 48000000){;}
                 
