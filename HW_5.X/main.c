@@ -124,7 +124,7 @@ int main() {
         LCD_clearScreen(BLACK);
         //LCD_drawPixel(test1 + 4,test2 + 4,GREEN);
         test = '!';
-        sprintf(array,"HELLO WORLD %i!",x);
+        sprintf(array,"HELLO\nWORLD %i!",x);
         LCD_drawString(28,32,array);
         //LCD_drawChar(10,10,'S');
         
