@@ -129,6 +129,8 @@ int main() {
     initI2C2();
     SPI1_init();
     LCD_init();
+    init_IMU();
+    LCD_clearScreen(BLACK);
     
     __builtin_enable_interrupts();
     
@@ -137,45 +139,36 @@ int main() {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
-        while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
+        
+        //while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
                // intialize LED on
         
-        //I2C_read_multiple(IMU_ADDRESS<<1,OUT_TEMP_L,output,14);
         
-        //temp = (output[0] | (output[1] << 8));
-        //g_x = (output[2] | (output[3] << 8));
-        //g_y = (output[4] | (output[5] << 8));
-        //g_z = (output[6] | (output[7] << 8));
-        //xl_x = (output[8] | (output[9] << 8));
-        //xl_y = (output[10] | (output[11] << 8));
-        //xl_z = (output[14] | (output[13] << 8));
+        I2C_read_multiple(IMU_ADDRESS<<1,OUT_TEMP_L,output,14);
         
-        //output[0] = readIMU(0x20);
-        //output[1] = readIMU(0x21);
+        temp = (output[0] | (output[1] << 8));
+        g_x = (output[2] | (output[3] << 8));
+        g_y = (output[4] | (output[5] << 8));
+        g_z = (output[6] | (output[7] << 8));
+        xl_x = (output[8] | (output[9] << 8));
+        xl_y = (output[10] | (output[11] << 8));
+        xl_z = (output[14] | (output[13] << 8));
         
-        //temp = (output[0] | (output[1] << 8));
         
-        //sprintf(array,"TEMP: %i",temp);
-        //LCD_drawString(2,22,array);
-        
-        //sprintf(array,"XL_X: %i",xl_x);
-        //LCD_drawString(2,2,array);
-        //sprintf(array,"XL_Y: %i",xl_y);
-        //LCD_drawString(2,12,array);
-        //sprintf(array,"XL_Z: %i",xl_z);
-        //LCD_drawString(2,22,array);
-        //sprintf(array,"G_X: %i",g_x);
-        //LCD_drawString(2,32,array);
-        //sprintf(array,"G_Y: %i",g_y);
-        //LCD_drawString(2,42,array);
-        //sprintf(array,"G_Z: %i",g_z);
-        //LCD_drawString(2,52,array);
-        //sprintf(array,"TEMP: %i",temp);
-        //LCD_drawString(2,62,array);
-        
-        test = readIMU(0x0F);
-        sprintf(array,"WHO: %i",test);
+        sprintf(array,"XL_X: %i",xl_x);
+        LCD_drawString(2,2,array);
+        sprintf(array,"XL_Y: %i",xl_y);
+        LCD_drawString(2,12,array);
+        sprintf(array,"XL_Z: %i",xl_z);
         LCD_drawString(2,22,array);
+        sprintf(array,"G_X: %i",g_x);
+        LCD_drawString(2,32,array);
+        sprintf(array,"G_Y: %i",g_y);
+        LCD_drawString(2,42,array);
+        sprintf(array,"G_Z: %i",g_z);
+        LCD_drawString(2,52,array);
+        sprintf(array,"TEMP: %i",temp);
+        LCD_drawString(2,62,array);
         
         //if (test==0b01101001){
         //    LATAbits.LATA4 = 1;
