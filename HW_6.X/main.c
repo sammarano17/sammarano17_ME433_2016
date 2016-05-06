@@ -93,15 +93,16 @@ void i2c_master_stop(void) {          // send a STOP:
 }
 
 //function initializations//
-unsigned char readIMU(void);
+unsigned char readIMU(char reg);
 void init_IMU(void);
 void I2C_read_multiple(char address, char Register, unsigned char * data, char length);
 void LCD_drawString(unsigned short x, unsigned short y, char *array);
 
 //variable init//
-//unsigned char test;
+    unsigned char test;
     unsigned char output[14];
-    signed short temp,g_x,g_y,g_z,xl_x,xl_y,xl_z;
+    signed short temp = 1;
+    signed short g_x,g_y,g_z,xl_x,xl_y,xl_z;
     char array[100];
 
 
@@ -136,36 +137,46 @@ int main() {
 	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
-        //while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
+        while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
                // intialize LED on
         
-        I2C_read_multiple(IMU_ADDRESS<<1,OUT_TEMP_L,output,14);
+        //I2C_read_multiple(IMU_ADDRESS<<1,OUT_TEMP_L,output,14);
         
-        temp = (output[0] | (output[1] << 8));
-        g_x = (output[2] | (output[3] << 8));
-        g_y = (output[4] | (output[5] << 8));
-        g_z = (output[6] | (output[7] << 8));
-        xl_x = (output[8] | (output[9] << 8));
-        xl_y = (output[10] | (output[11] << 8));
-        xl_z = (output[14] | (output[13] << 8));
+        //temp = (output[0] | (output[1] << 8));
+        //g_x = (output[2] | (output[3] << 8));
+        //g_y = (output[4] | (output[5] << 8));
+        //g_z = (output[6] | (output[7] << 8));
+        //xl_x = (output[8] | (output[9] << 8));
+        //xl_y = (output[10] | (output[11] << 8));
+        //xl_z = (output[14] | (output[13] << 8));
         
-        LCD_clearScreen(BLACK);
-        sprintf(array,"XL_X: %i",xl_x);
-        LCD_drawString(2,2,array);
-        sprintf(array,"XL_Y: %i",xl_y);
-        LCD_drawString(2,12,array);
-        sprintf(array,"XL_Z: %i",xl_z);
+        //output[0] = readIMU(0x20);
+        //output[1] = readIMU(0x21);
+        
+        //temp = (output[0] | (output[1] << 8));
+        
+        //sprintf(array,"TEMP: %i",temp);
+        //LCD_drawString(2,22,array);
+        
+        //sprintf(array,"XL_X: %i",xl_x);
+        //LCD_drawString(2,2,array);
+        //sprintf(array,"XL_Y: %i",xl_y);
+        //LCD_drawString(2,12,array);
+        //sprintf(array,"XL_Z: %i",xl_z);
+        //LCD_drawString(2,22,array);
+        //sprintf(array,"G_X: %i",g_x);
+        //LCD_drawString(2,32,array);
+        //sprintf(array,"G_Y: %i",g_y);
+        //LCD_drawString(2,42,array);
+        //sprintf(array,"G_Z: %i",g_z);
+        //LCD_drawString(2,52,array);
+        //sprintf(array,"TEMP: %i",temp);
+        //LCD_drawString(2,62,array);
+        
+        test = readIMU(0x0F);
+        sprintf(array,"WHO: %i",test);
         LCD_drawString(2,22,array);
-        sprintf(array,"G_X: %i",g_x);
-        LCD_drawString(2,32,array);
-        sprintf(array,"G_Y: %i",g_y);
-        LCD_drawString(2,42,array);
-        sprintf(array,"G_Z: %i",g_z);
-        LCD_drawString(2,52,array);
-        sprintf(array,"TEMP: %i",temp);
-        LCD_drawString(2,62,array);
         
-        //test = readIMU();
         //if (test==0b01101001){
         //    LATAbits.LATA4 = 1;
         //}
@@ -178,11 +189,11 @@ int main() {
 
 //IMU Setup//
 
-unsigned char readIMU(void){
+unsigned char readIMU(char reg){
     //LATAbits.LATA4 = 1;
     i2c_master_start();
     i2c_master_send(IMU_ADDRESS<<1);
-    i2c_master_send(0x0F);
+    i2c_master_send(reg);
     i2c_master_restart();
     i2c_master_send(0b11010111);
     unsigned char r = i2c_master_recv();
