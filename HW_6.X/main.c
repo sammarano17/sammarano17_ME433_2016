@@ -101,8 +101,9 @@ void LCD_drawString(unsigned short x, unsigned short y, char *array);
 //variable init//
     unsigned char test;
     unsigned char output[14];
-    signed short temp = 1;
-    signed short g_x,g_y,g_z,xl_x,xl_y,xl_z;
+    signed short scale = 1000;
+    signed short g_x,g_y,g_z,xl_x,xl_y,xl_z,temp;
+    float xl_xf,xl_yf,xl_zf,g_xf,g_yf,g_zf;
     char array[100];
 
 
@@ -140,7 +141,7 @@ int main() {
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
         
-        //while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
+        while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
                // intialize LED on
         
         
@@ -154,20 +155,27 @@ int main() {
         xl_y = (output[10] | (output[11] << 8));
         xl_z = (output[14] | (output[13] << 8));
         
+        //xl_x = xl_x/scale;
+        xl_xf = ((float)xl_x)/16383;
+        xl_yf = ((float)xl_y)/16383;
+        xl_zf = ((float)xl_z)/16383;
+        g_xf = ((float)g_x)/134;
+        g_yf = ((float)g_y)/134;
+        g_zf = ((float)g_z)/134;
         
-        sprintf(array,"XL_X: %i",xl_x);
+        sprintf(array,"XL_X(g): %.2f   ",xl_xf);
         LCD_drawString(2,2,array);
-        sprintf(array,"XL_Y: %i",xl_y);
+        sprintf(array,"XL_Y(g): %.2f   ",xl_yf);
         LCD_drawString(2,12,array);
-        sprintf(array,"XL_Z: %i",xl_z);
+        sprintf(array,"XL_Z(g): %.2f   ",xl_zf);
         LCD_drawString(2,22,array);
-        sprintf(array,"G_X: %i",g_x);
+        sprintf(array,"G_X(dps): %.2f   ",g_xf);
         LCD_drawString(2,32,array);
-        sprintf(array,"G_Y: %i",g_y);
+        sprintf(array,"G_Y(dps): %.2f   ",g_yf);
         LCD_drawString(2,42,array);
-        sprintf(array,"G_Z: %i",g_z);
+        sprintf(array,"G_Z(dps): %.2f   ",g_zf);
         LCD_drawString(2,52,array);
-        sprintf(array,"TEMP: %i",temp);
+        sprintf(array,"TEMP: %i   ",temp);
         LCD_drawString(2,62,array);
         
         //if (test==0b01101001){
