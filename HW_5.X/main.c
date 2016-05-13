@@ -106,6 +106,7 @@ int main() {
     //LATAbits.LATA4 = 1;       // intialize LED on
     SPI1_init();
     LCD_init();
+    LCD_clearScreen(BLACK);
     
     //unsigned short a = 0x0000;
     //char test;
@@ -121,7 +122,7 @@ int main() {
 		// remember the core timer runs at half the CPU speed
         _CP0_SET_COUNT(0);                   // set core timer to 0
         LATAbits.LATA4 = 0;       // intialize LED on
-        LCD_clearScreen(BLACK);
+        //LCD_clearScreen(BLACK);
         //LCD_drawPixel(test1 + 4,test2 + 4,GREEN);
         //test = '!';
         sprintf(array,"HELLO WORLD %i!",x);
