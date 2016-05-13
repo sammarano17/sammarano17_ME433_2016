@@ -4,6 +4,8 @@
 #ifndef readIMU_H__
 #define readIMU_H__
 float Read_IMU_Mouse(char reg);
+void init_IMU(void);
+void initI2C2(void);
 // lookup table for all of the ascii characters
 static const char ASCII[96][5] = {
  {0x00, 0x00, 0x00, 0x00, 0x00} // 20  (space)

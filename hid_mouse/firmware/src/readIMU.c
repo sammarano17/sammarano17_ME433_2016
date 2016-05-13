@@ -4,7 +4,7 @@
 #include <math.h> 
 #include "readIMU.h"
 
-// DEVCFG0
+/*// DEVCFG0
 #pragma config DEBUG = OFF // no debugging
 #pragma config JTAGEN = OFF // no jtag
 #pragma config ICESEL = ICS_PGx1 // use PGED1 and PGEC1
@@ -37,7 +37,7 @@
 #pragma config PMDL1WAY = OFF // allow multiple reconfigurations
 #pragma config IOL1WAY=  OFF // allow multiple reconfigurations
 #pragma config FUSBIDIO = ON // USB pins controlled by USB module
-#pragma config FVBUSONIO = ON // USB BUSON controlled by USB module
+#pragma config FVBUSONIO = ON // USB BUSON controlled by USB module*/
 
 #define IMU_ADDRESS 0b1101011
 #define OUT_TEMP_L 0x20
@@ -94,7 +94,7 @@ void i2c_master_stop(void) {          // send a STOP:
 
 //function initializations//
 unsigned char readIMU(char reg);
-void init_IMU(void);
+//void init_IMU(void);
 void I2C_read_multiple(char address, char Register, unsigned char * data, char length);
 void LCD_drawString(unsigned short x, unsigned short y, char *array);
 
@@ -110,34 +110,22 @@ static unsigned char nGammaSet[15]= {0x09,0x16,0x2D,0x0D,0x13,0x15,0x40,0x48,0x5
 
 
 float Read_IMU_Mouse(char reg) {
-    //__builtin_disable_interrupts();
-
-    initI2C2();
-    SPI1_init();
-    LCD_init();
-    init_IMU();
-    //LCD_clearScreen(BLACK);
     
-    //__builtin_enable_interrupts();
-    
-        
-	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
-		// remember the core timer runs at half the CPU speed
-        _CP0_SET_COUNT(0);                   // set core timer to 0
-        
-        while (_CP0_GET_COUNT() < 480000){;} // read at 50 Hz -- 480k / 24 MHz
-               // intialize LED on
-        
-        
         I2C_read_multiple(IMU_ADDRESS<<1,reg,output,2);
         
         temp = (output[0] | (output[1] << 8));
         
-        tempf = ((float)temp)/16383;
+        tempf = ((float)temp)/8000;
+        double f = tempf;
         
-        //tempf = ((float)temp)/16383;
-        //sprintf(array,"XL(g): %f   ",tempf);
-        //LCD_drawString(2,2,array);
+        if (reg==0x28){
+            sprintf(array,"XL_X(g):  %.2f  ",f);
+            LCD_drawString(2,2,array);
+        }
+        else if (reg==0x2A){
+            sprintf(array,"XL_Y(g):  %.2f  ",f);
+            LCD_drawString(2,12,array);
+        }
       
         return tempf;
     }
@@ -255,6 +243,7 @@ void SPI1_init() {
 
     // A0 / DAT pin
     ANSELBbits.ANSB15 = 0;
+    ANSELBbits.ANSB14 = 0;
     TRISBbits.TRISB15 = 0;
     LATBbits.LATB15 = 0;
 	

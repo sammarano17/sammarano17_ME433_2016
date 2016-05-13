@@ -414,8 +414,8 @@ void APP_Tasks ( void )
                     y = Read_IMU_Mouse(0x2A);
                     appData.mouseButton[0] = MOUSE_BUTTON_STATE_RELEASED;
                     appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
-                    appData.xCoordinate = x;
-                    appData.yCoordinate = y;
+                    appData.xCoordinate = -y;
+                    appData.yCoordinate = x;
                     vector ++;
                     movement_length = 0;
                 }

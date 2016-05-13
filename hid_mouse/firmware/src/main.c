@@ -58,7 +58,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stddef.h>                     // Defines NULL
 #include <stdbool.h>                    // Defines true
 #include <stdlib.h>                     // Defines EXIT_FAILURE
-#include "system/common/sys_module.h"   // SYS function prototypes
+#include "system/common/sys_module.h" // SYS function prototypes
+#include "readIMU.h"
 
 
 // *****************************************************************************
@@ -74,6 +75,11 @@ int main ( void )
     /* Initialize all MPLAB Harmony modules, including application(s). */
     SYS_Initialize ( NULL );
     
+    initI2C2();
+    SPI1_init();
+    LCD_init();
+    init_IMU();
+    LCD_clearScreen(BLACK);   
 
     while ( true )
     {
