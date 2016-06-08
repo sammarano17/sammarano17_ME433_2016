@@ -1,0 +1,20 @@
+The final app worked by plotting the center of mass on the 150th line and the 300th line using a threshold value to assign
+a pixel to green, denoting off the path, or black, indicating the line to be followed. Once these two values were obtained,
+the app calculated the distance between the center of masses, Diff, and the center of the center of masses, Center. Once 
+Diff and Center were calculated, they were scaled and then added to a variable called Proportion. The variable Proportion 
+was initialized at 1000 and the scaling factor for Center and Diff was 12. So for each pixel that the car was off center
+or angled, it changed Proportion by 12. Once Proportion was calculated, it was sent to the PIC and the PIC found whether it
+was greater than or less than 1000 and set the motor on the outside of the turn to 100% duty cycle and subtracted the value
+of Proportion greater than or less than 1000 from the motor on the inside of the turn. This way, both the error due to the
+angle of the car and due to the car being off-center were taken into account. 
+
+In the app there are two sliders, Threshold and an unassigned one. The threshold controls the threshold at which the app
+assigns a pixel to green or black when deciding where the line is. The unassigned one was intended to control the 
+magnitude of the control response, but before I set it up the control response performed extremely well at the value I 
+originally assigned.
+
+Additionally, the app originally displayed all 150 lines between COM1 and COM2, but this caused the app to run at around 
+8-9 fps, so once I had a general idea where Threshold should be, I only had it plot the lines where COM1 and COM2 are 
+calculated. This way I was able to get the fps back up to the 14-18 range. This resulted in smooth tracking of the line
+and great performance.
+
